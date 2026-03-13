@@ -1,6 +1,6 @@
 import AppKit
 
-class MenuBarController {
+class MenuBarController: NSObject {
     private var statusItem: NSStatusItem!
     private let settings: SettingsManager
     private let logger: TranscriptionLogger

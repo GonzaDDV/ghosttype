@@ -18,6 +18,10 @@ class HotkeyManager {
     private var runLoopSource: CFRunLoopSource?
     private var isRecording = false
 
+    deinit {
+        stop()
+    }
+
     func start() -> Bool {
         let eventMask = (1 << CGEventType.keyDown.rawValue) | (1 << CGEventType.keyUp.rawValue) | (1 << CGEventType.flagsChanged.rawValue)
 
@@ -94,19 +98,19 @@ private func hotkeyCallback(
     event: CGEvent,
     userInfo: UnsafeMutableRawPointer?
 ) -> Unmanaged<CGEvent>? {
-    guard let userInfo = userInfo else { return Unmanaged.passRetained(event) }
+    guard let userInfo = userInfo else { return Unmanaged.passUnretained(event) }
     let manager = Unmanaged<HotkeyManager>.fromOpaque(userInfo).takeUnretainedValue()
 
     if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
         if let tap = manager.eventTap {
             CGEvent.tapEnable(tap: tap, enable: true)
         }
-        return Unmanaged.passRetained(event)
+        return Unmanaged.passUnretained(event)
     }
 
     if manager.handleKeyEvent(event, type: type) {
         return nil
     }
 
-    return Unmanaged.passRetained(event)
+    return Unmanaged.passUnretained(event)
 }
