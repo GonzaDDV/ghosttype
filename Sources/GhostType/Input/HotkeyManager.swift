@@ -14,7 +14,7 @@ class HotkeyManager {
     var keyCode: CGKeyCode = CGKeyCode(kVK_Space)
     var modifierFlags: CGEventFlags = .maskAlternate // Option key
 
-    private var eventTap: CFMachPort?
+    fileprivate var eventTap: CFMachPort?
     private var runLoopSource: CFRunLoopSource?
     private var isRecording = false
 
