@@ -151,12 +151,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             settingsWindow = SettingsWindowController(settings: settings)
             settingsWindow?.onSettingsSaved = { [weak self] in
                 guard let self = self else { return }
-                // Update hotkey mode from settings
                 self.hotkeyManager.mode = self.settings.dictationMode == .toggle ? .toggle : .holdToTalk
             }
         }
+        // Switch to regular app so the window gets full keyboard focus (Cmd+V etc.)
+        NSApp.setActivationPolicy(.regular)
         settingsWindow?.showWindow(nil)
         NSApp.activate(ignoringOtherApps: true)
+
+        // Watch for window close to switch back to accessory (menu bar only)
+        NotificationCenter.default.addObserver(
+            forName: NSWindow.willCloseNotification,
+            object: settingsWindow?.window,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self = self else { return }
+            self.settingsWindow = nil
+            NSApp.setActivationPolicy(.accessory)
+        }
     }
 
     private func showAccessibilityAlert() {
